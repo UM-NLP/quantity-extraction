@@ -1,6 +1,8 @@
 import openai
 import yaml
 import json
+import spacy
+from deepmerge import always_merger
 
 def load_yaml(prompt_file, variable_names):
     with open(prompt_file, 'r', encoding="utf8") as file:
@@ -31,25 +33,33 @@ def openai_chat_completion_response(system, user, assistance, final):
         ]
     )
     return response['choices'][0]['message']['content'].strip(" \n")
-
+# The function checks if the length of the current sentence (including any previous sentences) is less than 100 characters.
+# If it is, the current sentence is added to the previous sentence with a space in between.
+# Otherwise, the current sentence is considered as a new separate sentence.
+def split_text_into_sentences(text):
+    nlp = spacy.load("en_core_web_sm")
+    doc = nlp(text)
+    sentences = []
+    current_sentence = ""
+    for sentence in doc.sents:
+        if len(current_sentence) < 100:
+            if current_sentence:
+                current_sentence += " " + sentence.text
+            else:
+                current_sentence += sentence.text
+        else:
+            sentences.append(current_sentence)
+            current_sentence = sentence.text
+    if current_sentence:
+        sentences.append(current_sentence)
+    return sentences
 def relation_extraction_engine(my_sentence):
-    ner_prompt = GUIDELINES_NER_PROMPT.format(my_sentence)  # inject the input to the ner prompt
-    enriched_sentence = openai_chat_completion_response(SYSTEM_NER_PROMPT, USER_NER_PROMPT, ASSISTANT_NER_PROMPT, ner_prompt)  #generate in-line ner
-    customized_prompt = GUIDELINES_PROMPT.format(enriched_sentence)  # inject the input (including ner) to the prompt
-    results = openai_chat_completion_response(SYSTEM_PROMPT, USER_PROMPT, ASSISTANT_PROMPT, customized_prompt)  #generate output
-    print (results)
-    try:
-        json_data = json.loads(results)
-    except json.JSONDecodeError:
-        json_data = {}
-    return json_data
-
     sentences=split_text_into_sentences(my_sentence)
     results= {}
     #merger = Merger([(list, "append")], [], [])
     for sentence in sentences:
         try:
-            ner_prompt = GUIDELINES_NER_PROMPT.format(my_sentence)  # inject the input to the ner prompt
+            ner_prompt = GUIDELINES_NER_PROMPT.format(sentence)  # inject the input to the ner prompt
             enriched_sentence = openai_chat_completion_response(SYSTEM_NER_PROMPT, USER_NER_PROMPT, ASSISTANT_NER_PROMPT, ner_prompt)  #generate in-line ner
             customized_prompt = GUIDELINES_PROMPT.format(enriched_sentence)  # inject the input (including ner) to the prompt
             result_sentence_level = openai_chat_completion_response(SYSTEM_PROMPT, USER_PROMPT, ASSISTANT_PROMPT, customized_prompt)
@@ -61,5 +71,5 @@ def relation_extraction_engine(my_sentence):
     return results
 
 
-initialize("D:\github\quantity-extraction\openai.yaml", "D:\github\quantity-extraction\prompt_ner.yaml", "D:\github\quantity-extraction\prompt_multi_step.yaml")
-relation_extraction_engine("The current state of the art batteries offers about 200-400 Wh/Kg (Watt-hours per Kilogram).")
+#initialize("D:\github\quantity-extraction\openai.yaml", "D:\github\quantity-extraction\prompt_ner.yaml", "D:\github\quantity-extraction\prompt_multi_step.yaml")
+#relation_extraction_engine("The current state of the art batteries offers about 200-400 Wh/Kg (Watt-hours per Kilogram).")

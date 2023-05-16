@@ -17,7 +17,7 @@ with open(xml_file_path, 'r') as f:
     data = f.read()
 pattern = f'(?={re.escape(head)})'
 data_splat = re.split(pattern, data)
-data_splat=data_splat[1:]
+data_splat=data_splat[1:200]
 for xml_data in data_splat:
     Bs_data = BeautifulSoup(xml_data, "xml")
     patent_name=Bs_data.find('country').string+"-"+\
