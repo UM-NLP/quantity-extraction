@@ -1,6 +1,7 @@
 import json
 import os
 
+
 def process_json_files(folder_path):
     benchmarks=[]
     inputs=[]
