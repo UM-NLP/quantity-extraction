@@ -36,16 +36,15 @@ class EngineSingleStep:
             ]
         )
         return response['choices'][0]['message']['content'].strip(" \n")
-    # The function checks if the length of the current sentence (including any previous sentences) is less than 100 characters.
+    # An Spacy sentence detection. The function also checks if the length of the current sentence is very short.
     # If it is, the current sentence is added to the previous sentence with a space in between.
-    # Otherwise, the current sentence is considered as a new separate sentence.
     def split_text_into_sentences(self, text):
-        nlp = spacy.load("en_core_web_sm")
+        THRESHOLD=40
         doc = nlp(text)
         sentences = []
         current_sentence = ""
         for sentence in doc.sents:
-            if len(current_sentence) < 40:
+            if len(current_sentence) < THRESHOLD:
                 if current_sentence:
                     current_sentence += " " + sentence.text
                 else:
@@ -53,7 +52,7 @@ class EngineSingleStep:
             else:
                 sentences.append(current_sentence)
                 current_sentence = sentence.text
-        if current_sentence:
+        if len(current_sentence) > THRESHOLD:
             sentences.append(current_sentence)
         return sentences
 
@@ -65,6 +64,7 @@ class EngineSingleStep:
                 customized_prompt = self.GUIDELINES_PROMPT.format(sentence)  # inject the input to the prompt
                 customized_prompt=customized_prompt.replace("{{","{").replace("}}","}")
                 result_sentence_level = self.openai_chat_completion_response(customized_prompt)  #extract informatio
+                print(result_sentence_level)
                 result_sentence_level = json.loads(result_sentence_level) #string to json
             #except:
                 #result_sentence_level = {}
