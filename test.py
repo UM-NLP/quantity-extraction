@@ -1,66 +1,88 @@
-import json
+import re
 
-def calculate_accuracy(data_json, ground_truth_json):
-    data = json.loads(data_json)
-    ground_truth = json.loads(ground_truth_json)
-    total_keys = 0
-    matching_keys = 0
-    def iterate_keys(obj1, obj2):
-        nonlocal total_keys, matching_keys
-        if isinstance(obj1, dict) and isinstance(obj2, dict):
-            for key in obj1.keys():
-                total_keys += 1
-                if key in obj2 and obj1[key] == obj2[key]:
-                    matching_keys += 1
-                elif key in obj1 and key in obj2:
-                    iterate_keys(obj1[key], obj2[key])
-        elif isinstance(obj1, list) and isinstance(obj2, list):
-            for item1, item2 in zip(obj1, obj2):
-                iterate_keys(item1, item2)
-    iterate_keys(data, ground_truth)
-    accuracy = matching_keys / total_keys
-    return accuracy
-data_json = '''
-{"measured": [{
-    "name": "Johny",
-    "age": 32,
-    "address": {
-        "street": "123 Main St",
-        "city": "London"
-    },
-    "languages": ["Python", "JavaScript"]
-},
+string = """
+Entity Definitions:
+1. Entity: Any object or concept that can be identified and referred to in text.
+2. Property: Any characteristic or attribute of an entity that can be measured or described.
+3. Quantity: A quantity is a numeric value and, if applicable, a unit that describes the amount or extent of a property.
+
+Output Format:
 {
-    "name": "Johny",
-    "age": 32,
-    "address": {
-        "street": "123 Main St",
-        "city": "New York"
-    },
-    "languages": ["Python", "JavaScript"]
-}]}
-'''
+  "entities": [
+    {
+      "entity_name": "<entity_name>",
+      "properties": [
+        {
+          "property_name": "<property_name>",
+          "quantity": {
+            "quantity_unit": "<quantity_unit>",
+            "quantity_lower_value": "<quantity_lower_value>",
+            "quantity_upper_value": "<quantity_upper_value>",
+            "quantity_modifier": "<quantity_modifier>"
+          }
+        }
+      ]
+    }
+  ]
+}
 
-ground_truth_json = '''
-{"measured": [{
-    "name": "Johnys",
-    "age": 32,
-    "address": {
-        "street": "123 Main St",
-        "city": "New York"
-    },
-    "languages": ["Python", "JavaScript"]
-},
-{
-    "name": "Johny",
-    "age": 32,
-    "address": {
-        "street": "123 Main St",
-        "city": "London"
-    },
-    "languages": ["Pythons", "JavaScript"]
-}]}
-'''
+Examples:
+1. Sentence: The temperature of the water in the tank is 50 degrees Celsius.
+   Output:
+   {
+     "entities": [
+       {
+         "entity_name": "water",
+         "properties": [
+           {
+             "property_name": "temperature",
+             "quantity": {
+               "quantity_unit": "degrees Celsius",
+               "quantity_lower_value": "50",
+               "quantity_upper_value": "",
+               "quantity_modifier": ""
+             }
+           }
+         ]
+       }
+     ]
+   }
 
-accuracy = calculate_accuracy(data_json, ground_truth_json)
-print(f"Accuracy: {accuracy * 100}%")
+2. Sentence: The car has four wheels and a steering wheel.
+   Output: {}
+
+3. Sentence: The experiment resulted in a catalytic activity for NOx of 120 operations.
+   Output:
+   {
+     "entities": [
+       {
+         "entity_name": "NOx",
+         "properties": [
+           {
+             "property_name": "catalytic activity",
+             "quantity": {
+               "quantity_unit": "operations",
+               "quantity_lower_value": "120",
+               "quantity_upper_value": "220",
+               "quantity_modifier": "greater than or equal to"
+             }
+           }
+         ]
+       }
+     ]
+   }
+
+Note: The new prompt focuses on the general concept of entity, property, and quantity, which can be applied to a wide range of relationship extraction tasks. It also provides clearer and more concise definitions and examples, making it easier for users to understand and use the system."""
+
+start_marker = "Entity Definitions"
+end_marker = r"}"
+
+start_index = string.find(start_marker)
+end_index = string.rfind(end_marker)
+
+if start_index != -1 and end_index != -1:
+    end_index += len(end_marker)
+    selected_part = string[start_index:end_index]
+    print(selected_part)
+else:
+    print("Start and/or end markers not found in the string.")

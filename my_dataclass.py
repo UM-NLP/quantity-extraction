@@ -1,8 +1,5 @@
-from pydantic import BaseModel
-import json
 from dataclasses import dataclass, field, asdict
 from typing import Optional, List
-
 
 @dataclass
 class Quantity:
@@ -11,19 +8,15 @@ class Quantity:
     quantity_upper_value: Optional[str] = None
     quantity_modifier: str = ""
 
-
 @dataclass
 class MeasuredProperty:
     property_name: str
     quantity: Quantity= None
 
-
-
 @dataclass
 class MeasuredEntity:
     entity_name: str
     measured_properties: List[MeasuredProperty] = field(default_factory=list)
-
 
 @dataclass
 class Patent:
@@ -36,10 +29,6 @@ class Patent:
     def add_entity(self, entity_name: str, measured_properties: List[MeasuredProperty]):
         entity = MeasuredEntity(entity_name=entity_name, measured_properties=measured_properties)
         self.measured_entities.append(entity)
-
-
-
-
 
 #Create an instance of the Patent class with quantity values and their units
 # quantity_1 = Quantity(quantity_lower_value=20, quantity_upper_value=40, quantity_unit="ml", quantity_modifier="almost")

@@ -42,7 +42,7 @@ def split_text_into_sentences(text):
     sentences = []
     current_sentence = ""
     for sentence in doc.sents:
-        if len(current_sentence) < 100:
+        if len(current_sentence) < 40:
             if current_sentence:
                 current_sentence += " " + sentence.text
             else:
@@ -53,14 +53,26 @@ def split_text_into_sentences(text):
     if current_sentence:
         sentences.append(current_sentence)
     return sentences
+def filter_ner_result(input_sentence, ner_output):
+    words_str1 = input_sentence.split()
+    words_str2 = ner_output.split()
+    for i in range(len(words_str2)):
+        if words_str2[i:i+len(words_str1)][0] == words_str1[0] and words_str2[i:i+len(words_str1)][1] == words_str1[1]: #compare first two words
+            extracted_words = words_str2[i:]
+            extracted_sentence = ' '.join(extracted_words)
+            return extracted_sentence
+    return input_sentence
 def relation_extraction_engine(my_sentence):
     sentences=split_text_into_sentences(my_sentence)
     results= {}
-    #merger = Merger([(list, "append")], [], [])
     for sentence in sentences:
         try:
             ner_prompt = GUIDELINES_NER_PROMPT.format(sentence)  # inject the input to the ner prompt
+            #print("ner_prompt: ", ner_prompt)
             enriched_sentence = openai_chat_completion_response(SYSTEM_NER_PROMPT, USER_NER_PROMPT, ASSISTANT_NER_PROMPT, ner_prompt)  #generate in-line ner
+            print (enriched_sentence)
+            enriched_sentence=filter_ner_result(sentence,enriched_sentence)
+            #print ("ner:  ", enriched_sentence)
             customized_prompt = GUIDELINES_PROMPT.format(enriched_sentence)  # inject the input (including ner) to the prompt
             result_sentence_level = openai_chat_completion_response(SYSTEM_PROMPT, USER_PROMPT, ASSISTANT_PROMPT, customized_prompt)
             result_sentence_level = json.loads(result_sentence_level) #string to json
