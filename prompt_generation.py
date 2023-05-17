@@ -28,7 +28,7 @@ for i in range (0, len(benchmarks)):
     output=relation_extractor.relation_extractor(input)
     if output!=benchmark:
         new_prompt=prompt_generator.prompt_generator(relation_extractor.GUIDELINES_PROMPT,output, benchmark)
+        print(" my new_prompt:", new_prompt)
         relation_extractor.GUIDELINES_PROMPT=new_prompt
     else:
         print ("success")
-print(new_prompt)

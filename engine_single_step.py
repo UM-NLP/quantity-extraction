@@ -63,6 +63,7 @@ class EngineSingleStep:
         for sentence in sentences:
             #try:
                 customized_prompt = self.GUIDELINES_PROMPT.format(sentence)  # inject the input to the prompt
+                customized_prompt=customized_prompt.replace("{{","{").replace("}}","}")
                 result_sentence_level = self.openai_chat_completion_response(customized_prompt)  #extract informatio
                 result_sentence_level = json.loads(result_sentence_level) #string to json
             #except:
@@ -74,10 +75,12 @@ class EngineSingleStep:
         end_marker = r"}"
         start_index = chatbot_output.find(start_marker)
         end_index = chatbot_output.rfind(end_marker)
-
+        if start_index == -1:
+            start_index = chatbot_output.find("Please provide")
         if start_index != -1 and end_index != -1:
             end_index += len(end_marker)
             selected_part = chatbot_output[start_index:end_index]
+            selected_part=selected_part.replace("{","{{").replace("}","}}")
             selected_part+="\n Sentence: {} \n Output: "
             return selected_part
         else:
@@ -85,7 +88,7 @@ class EngineSingleStep:
 
     def prompt_generator(self, current_re_prompt, re_output, re_expected_output):
         try:
-            customized_prompt = self.GUIDELINES_PROMPT.format(current_re_prompt, re_output, re_expected_output)  # inject the input to the prompt
+            customized_prompt = self.GUIDELINES_PROMPT.format(current_re_prompt,str(re_output), str(re_expected_output))  # inject the input to the prompt
             result = self.openai_chat_completion_response(customized_prompt)  #generate new re prompt
             new_re_prompt=self.select_prompt(result)
         except:
