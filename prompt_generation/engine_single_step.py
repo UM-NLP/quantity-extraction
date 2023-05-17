@@ -55,6 +55,10 @@ class EngineSingleStep:
         if len(current_sentence) > THRESHOLD:
             sentences.append(current_sentence)
         return sentences
+    def json_validator(self, text):
+        text=text.replace("{{","{").replace("}}","}")
+        json_text = json.loads(text)
+        return json_text
 
     def relation_extractor(self, my_sentence):
         sentences=self.split_text_into_sentences(my_sentence)
@@ -65,7 +69,7 @@ class EngineSingleStep:
                 customized_prompt=customized_prompt.replace("{{","{").replace("}}","}")
                 result_sentence_level = self.openai_chat_completion_response(customized_prompt)  #extract informatio
                 print(result_sentence_level)
-                result_sentence_level = json.loads(result_sentence_level) #string to json
+                result_sentence_level=self.json_validator(result_sentence_level) #string to json
             #except:
                 #result_sentence_level = {}
                 results=always_merger.merge(results, result_sentence_level)
