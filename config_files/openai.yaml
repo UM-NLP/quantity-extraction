@@ -1,4 +1,4 @@
-API_KEY: "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"
+API_KEY: "<open-ai-key>"
 MODEL_NAME: "gpt-3.5-turbo"
 TOP_P: 0
 TEMPERATURE: 0.1

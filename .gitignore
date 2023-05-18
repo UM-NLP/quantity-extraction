@@ -8,7 +8,7 @@ __pycache__/
 *.dtd
 # C extensions
 *.so
-
+openai-local.yaml
 # Distribution / packaging
 .Python
 build/
