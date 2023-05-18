@@ -2,7 +2,7 @@ import json
 import os
 import engine_single_step
 
-instance_engine=engine_single_step.EngineSingleStep("config_files/openai.yaml", "config_files/prompt_single_step.yaml")  #initialize relation extraction engine
+instance_engine=engine_single_step.EngineSingleStep("/Users/mohammadsaloot/IdeaProjects/quantity-extraction2/openai-local.yaml", "config_files/prompt_single_step.yaml")  #initialize relation extraction engine
 def process_json_files(folder_path):
     for filename in os.listdir(folder_path):
         if filename.endswith(".json"):
