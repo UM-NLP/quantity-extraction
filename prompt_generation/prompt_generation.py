@@ -1,7 +1,11 @@
 import json
 import os
+import sys
+sys.path.append("..") # Add the parent folder to the module search path
+import llm_engine
+import engine_single_step
 
-def process_json_files(folder_path):
+def process_json_files(folder_path): # read development dataset: txt files as input, json files are results
     benchmarks=[]
     inputs=[]
     for filename in os.listdir(folder_path):
@@ -15,22 +19,15 @@ def process_json_files(folder_path):
                 inputs.append( file.read())
     return inputs, benchmarks
 
-import engine_single_step
-relation_extractor=engine_single_step.EngineSingleStep("../openai.yaml", "prompt_single_step.yaml")
-prompt_generator=engine_single_step.EngineSingleStep("../openai.yaml", "prompt_generation.yaml")
-folder_path = "development_dataset"
-
-# Call the process_json_files function
-inputs, benchmarks=process_json_files(folder_path)
-for i in range (0, len(benchmarks)):
-    benchmark=benchmarks[i]
-    input=inputs[i]
-    output=relation_extractor.relation_extractor(input)
-    if output!=benchmark: #if completely match, don't change the prompt
-        new_prompt=prompt_generator.prompt_generator(relation_extractor.GUIDELINES_PROMPT,output, benchmark)
-        #print(" my new_prompt:", new_prompt)
-        relation_extractor.GUIDELINES_PROMPT=new_prompt
-    else:
-        print ("success")
-print(new_prompt)
-
+def generate_prompt(development_dataset, openai_setting_file, prompt_relation_extraction, prompt_generator): # generate prompt based on development dataset samples
+    relation_extractor= engine_single_step.EngineSingleStep(openai_setting_file, prompt_relation_extraction) # instantiate quantity extractor
+    prompt_generator= llm_engine.LlmEngine(openai_setting_file, prompt_generator) # instantiate LLM prompt generator
+    inputs, benchmarks=process_json_files(development_dataset)
+    for i in range (0, len(benchmarks)): # loop development dataset
+        benchmark=benchmarks[i]
+        input=inputs[i]
+        output=relation_extractor.relation_extractor(input)
+        if output!=benchmark: # if completely match, don't change the prompt
+            new_prompt=prompt_generator.prompt_generator( benchmarks, relation_extractor.SYSTEM_PROMPT)
+            relation_extractor.SYSTEM_PROMPT=new_prompt
+    return new_prompt

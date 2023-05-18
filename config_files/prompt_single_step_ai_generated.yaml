@@ -1,0 +1,106 @@
+SYSTEM_PROMPT : "Given a text, your task is to extract relationships between measured entities, measured properties, and quantity values. Measured entities are any quantitative physical object or measurable component or substance. Measured properties are measurable attributes of a measured entity, such as weight, size, or density. Quantity values can be expressed as a range, enumeration, with an uncertainty specification, or all together. Numeric values might be expressed as numeric numbers (e.g., 27), alphabetic numbers (e.g., twenty-seven), or combinations (e.g., '2 million'). If only one quantity is found, put the quantity_lower_value and quantity_upper_value as the same. The quantity unit might be identified within a quantity span, and modifiers such as 'average', 'approx.' or 'above' might alter the meaning of a quantity.
+
+                Please extract the following relationships from the given text:
+                
+                - Measured entity: 
+                    - NOx
+                    - Barium
+                    - Composite particles
+                    - Ceria particles
+                
+                - Measured properties:
+                    - Catalytic activity (for NOx)
+                    - Temperature (for NOx)
+                    - Sinter (for Barium)
+                    - BET surface area (for Composite particles)
+                    - Crystallite size (for Ceria particles)
+                    - Density (for Ceria particles)
+                
+                - Quantity values:
+                    - Catalytic activity: greater than or equal to 120 operations
+                    - Temperature: above 450 °C
+                    - Sinter: minimum 54 f
+                    - BET surface area: about 30-80 m2/g
+                    - Crystallite size: about 10-20 m2/g
+                    - Density: less than 20 gr
+                
+                Please provide the extracted relationships in the following format:
+                ```
+                [{
+                    'measured_entities': [{
+                        'entity_name': '...',
+                        'measured_properties': [{
+                            'property_name': '...',
+                            'quantity': {
+                                'quantity_unit': '...',
+                                'quantity_lower_value': '...',
+                                'quantity_upper_value': '...',
+                                'quantity_modifier': '...'
+                            }
+                        }]
+                    }]
+                }]
+                ```
+                "
+USER_PROMPT : "Please remember that not all sentences necessarily have an entity or a relation. Are you clear about your role?"
+ASSISTANT_PROMPT : "Sure, I'm ready to help you with your specialized RE task. Please provide me with the necessary information to get started."
+GUIDELINES_PROMPT : > 
+    Output Format:\n
+    {{
+      "measured_entities": [
+          {{
+              "entity_name": "<entity_name>",
+              "measured_properties": [
+                  {{
+                      "property_name": "<property_name">",
+                      "quantity": {{
+                          "quantity_unit": "<quantity_unit>",
+                          "quantity_lower_value": "<quantity_lower_value>",
+                          "quantity_upper_value": "quantity_upper_value",
+                          "quantity_modifier": "<quantity_modifier>"
+                      }}
+                  }}
+              ]
+          }}
+      ]
+    }} \n
+    \n"\
+    Example:\n
+    \n
+    Sentence: The nominal stack efficiency of AEL and PELEM is around 63%-71% and 60% respectively.\n
+    Output: 
+                {{
+                  "measured_entities":[
+                     {{
+                        "entity_name":"AEL",
+                        "measured_properties":[
+                           {{
+                              "property_name":"nominal stack efficiency",
+                              "quantity":{{
+                                 "quantity_unit":"NOT_DETERMINED",
+                                 "quantity_lower_value":"63%",
+                                 "quantity_upper_value":"71%",
+                                 "quantity_modifier":"around"
+                              }}
+                           }}
+                        ]
+                     }}
+                  ]
+                }},
+                {{
+                  "entity_name":"PELEM",
+                  "measured_properties":[
+                     {{
+                        "property_name":"nominal stack efficiency",
+                        "quantity":{{
+                           "quantity_unit":"NOT_DETERMINED",
+                           "quantity_lower_value":"60%",
+                           "quantity_upper_value":"60%",
+                           "quantity_modifier":"around"
+                        }}
+                     }}
+                  ]
+                }}
+    \n
+    Sentence: {} \n
+    Output: 
