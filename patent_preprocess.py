@@ -41,6 +41,3 @@ def preprocess(data_splat):
         with open("processed_data/"+patent_name+".json", 'w', encoding='utf-8') as f:
             f.write(patent_json)
 
-zip_file = 'processed_data/ipa210121.zip'
-splat_xml = load_files(zip_file)
-preprocess(splat_xml)
