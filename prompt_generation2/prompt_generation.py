@@ -16,8 +16,8 @@ def process_json_files(folder_path):
     return inputs, benchmarks
 
 import engine_single_step
-relation_extractor=engine_single_step.EngineSingleStep("../openai.yaml", "prompt_single_step.yaml")
-prompt_generator=engine_single_step.EngineSingleStep("../openai.yaml", "prompt_generation.yaml")
+relation_extractor= engine_single_step.EngineSingleStep("../openai.yaml", "../prompt_single_step_system.yaml")
+prompt_generator= engine_single_step.EngineSingleStep("../openai.yaml", "prompt_generation.yaml")
 folder_path = "development_dataset"
 
 # Call the process_json_files function
@@ -27,10 +27,10 @@ for i in range (0, len(benchmarks)):
     input=inputs[i]
     output=relation_extractor.relation_extractor(input)
     if output!=benchmark: #if completely match, don't change the prompt
-        new_prompt=prompt_generator.prompt_generator(relation_extractor.GUIDELINES_PROMPT,output, benchmark)
-        #print(" my new_prompt:", new_prompt)
-        relation_extractor.GUIDELINES_PROMPT=new_prompt
+        new_prompt=prompt_generator.prompt_generator(input, relation_extractor.SYSTEM_PROMPT)
+        print(" my new_prompt:", new_prompt)
+        relation_extractor.SYSTEM_PROMPT=new_prompt
     else:
         print ("success")
-print(new_prompt)
+
 

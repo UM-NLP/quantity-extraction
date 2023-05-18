@@ -1,15 +1,16 @@
-SYSTEM_PROMPT : "You are A specialized Relation Extraction (RE) and you should detect relationship hierarchy between three types of entities from any given text: measured entity, measured property, and quantity. each measured entity may have multiple measured property but each measured property has one quantity object. I will provide you the definition of the entities you need to extract, the sentence from where your extract the relations and the output format with examples."
+SYSTEM_PROMPT : "You are a specialized Relation Extraction (RE) system that should detect the relationship between two types of entities from any given text: material properties and their corresponding values. Material properties can be any physical, biological, or chemical characteristics of any measurable item that can be measured directly. For example, for a piece of rock, its measured property can be weight, size, density, and etc. The values can be expressed as numeric numbers (e.g., 27), alphabetic numbers (e.g., twenty-seven), combinations (e.g., '2 million'), or ranges. If a range is given, extract both the lower and upper bounds. If only one value is given, put the same value for both lower and upper bounds. If the unit of measurement is given, extract it as well. If a modifier is present, extract it as well.
+
+                Your task is to extract the following information from the given text: 
+                - Material property: catalytic activity for NOx
+                - Value: marked decrease to 120 operations
+                - Unit: operations
+                - Modifier: None
+                
+                Example input: \"After such exposure, such experiment show a marked decrease in catalytic activity for NOx to 120 operations.\"
+                "
 USER_PROMPT : "Please remember that not all sentences necessarily have an entity or a relation. Are you clear about your role?"
 ASSISTANT_PROMPT : "Sure, I'm ready to help you with your specialized RE task. Please provide me with the necessary information to get started."
 GUIDELINES_PROMPT : > 
-    Entity Definitions:\n
-    1. measured entity: Short name or full name of a any quantitative physical object or any measurable component or substance. It is anything measurable.\n
-    2. measured property: It can be any physical, biological, or chemical characteristics of any measurable item that can be measured directly. it is a measurable attribute of a measured entity. For example, for a piece of rock, its measured property can be weight, size, density and etc. based on a given input text. If a measured property is given implicitly in a text, generate the most sensible measured property.
-    3. quantity unit: A quantity (e.g., '1 kg') is composed of a numeric value and, if applicable, a unit.
-    4. quantity values: A quantity might be given as a range, enumeration, with an uncertainty specification, or all together. Numeric values might be expressed as numeric numbers (e.g., 27), alphabetic numbers (e.g., twenty-seven), combinations (e.g., '2 million'). Sometimes quantities are not range of numbers. Thus, if only one quantity found, put quantity_lower_value and quantity_lower_value value as the same.
-    5. quantity unit: Within a quantity span, the unit might be identified. Units are often abbreviated according to their symbol (e.g., ‘J’ for Joule). Note that nouns, such as in ‘family houses’, are sometimes considered units. 
-    6. quantity modifier: The meaning of a quantity is often altered by modifiers such as 'average', 'approx.' or 'above'. Modifiers adjacent to numeric values are sometimes included in the quantity spans.
-    \n
     Output Format:\n
     {{
       "measured_entities": [
@@ -33,7 +34,7 @@ GUIDELINES_PROMPT : >
     Example:\n
     \n
     Sentence: The nominal stack efficiency of AEL and PELEM is around 63%-71% and 60% respectively.\n
-        Output: 
+    Output: 
                 {{
                   "measured_entities":[
                      {{
@@ -67,6 +68,5 @@ GUIDELINES_PROMPT : >
                   ]
                 }}
     \n
-    \n
     Sentence: {} \n
-    Output:
+    Output: 

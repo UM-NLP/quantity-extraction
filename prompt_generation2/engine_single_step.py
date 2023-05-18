@@ -97,15 +97,15 @@ class EngineSingleStep:
         else:
             chatbot_output
 
-    def prompt_generator(self, current_re_prompt, re_output, re_expected_output):
+    def prompt_generator(self, intput, current_re_prompt ):
         try:
-            current_re_prompt=current_re_prompt.format(" {} ")
-            customized_prompt = self.GUIDELINES_PROMPT.format(current_re_prompt,str(re_output), str(re_expected_output))  # inject the input to the prompt
+            #current_re_prompt=current_re_prompt.format(" {} ")
+            customized_prompt = self.GUIDELINES_PROMPT.format(intput, current_re_prompt)  # inject the input to the prompt
             result = self.openai_chat_completion_response(customized_prompt)  #generate new re prompt
-            new_re_prompt=self.select_prompt(result)
+            #new_re_prompt=self.select_prompt(result)
         except:
             print("exception")
-            new_re_prompt = current_re_prompt
-        return new_re_prompt
+            result = current_re_prompt
+        return result
 # instance=EngineSingleStep("D:\github\quantity-extraction\openai.yaml", "D:\github\quantity-extraction\prompt_single_step.yaml")
 # instance.relation_extractor(" Old batteries offer about 100-200 Wh/Kg. State of the art batteries offer about 200-400 Wh/Kg.")
