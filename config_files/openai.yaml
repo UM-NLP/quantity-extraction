@@ -1,0 +1,4 @@
+API_KEY: "<open-ai-key>"
+MODEL_NAME: "gpt-3.5-turbo"
+TOP_P: 0
+TEMPERATURE: 0.1
